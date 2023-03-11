@@ -1,0 +1,7 @@
+
+spring:
+  application:
+    name: SpringBoot-Kafka-Consumer
+
+server:
+  port: 8080
