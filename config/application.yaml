@@ -5,3 +5,17 @@ spring:
 
 server:
   port: 8080
+
+kafka:
+  brokerAddress: localhost:9093
+  schemaRegistryAddress: localhost:8081
+  topics:
+    user:
+      name: user-topic
+      group: userTopicGroup
+    company:
+      name: company-topic
+      group: companyTopicGroup
+    message:
+      name: message-topic
+      group: messageTopicGroup
