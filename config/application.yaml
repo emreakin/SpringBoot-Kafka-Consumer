@@ -7,10 +7,8 @@ server:
   port: 8080
 
 kafka:
-  brokerAddress: localhost:9093
-  schemaRegistryAddress: localhost:8081
-  sasl-username: your_sasl_username
-  sasl-password: your_sasl_password
+  brokerAddress: localhost:29092
+  schemaRegistryAddress: http://localhost:8081
   topics:
     user:
       name: user-topic

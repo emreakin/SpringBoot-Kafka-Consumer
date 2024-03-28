@@ -3,6 +3,7 @@ package com.emreakin.configuration;
 import com.emreakin.model.CompanyModel;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.serializers.subject.RecordNameStrategy;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -30,11 +31,23 @@ public class ConsumerConfiguration {
     @Value("${kafka.schemaRegistryAddress}")
     private String schemaRegistryAddress;
 
-    @Value("${kafka.sasl-username}")
-    private String saslUsername;
+    /*@Bean
+    public ConsumerFactory<String, schema.avro.User> userConsumerFactory() {
+        Map<String, Object> props = new HashMap<>();
 
-    @Value("${kafka.sasl-password}")
-    private String saslPassword;
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerAddress);
+
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
+
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+
+        props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryAddress);
+
+        props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
+
+        return new DefaultKafkaConsumerFactory<>(props);
+    }*/
 
     @Bean
     public ConsumerFactory<String, schema.avro.User> userConsumerFactory() {
@@ -45,7 +58,7 @@ public class ConsumerConfiguration {
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, KafkaAvroDeserializer.class);
 
-        props.put(AbstractKafkaAvroSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, RecordNameStrategy.class.getName());
+        props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
 
         return new DefaultKafkaConsumerFactory<>(props);
     }
@@ -99,12 +112,6 @@ public class ConsumerConfiguration {
         Map<String, Object> props = new HashMap<>();
 
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerAddress);
-
-        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
-        props.put(SaslConfigs.SASL_MECHANISM, "PLAIN");
-        props.put(SaslConfigs.SASL_JAAS_CONFIG, String.format(
-                "%s required username=\"" + saslUsername + "\" password=\"" + saslPassword + "\";", PlainLoginModule.class.getName(), "username", "password"
-        ));
 
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);

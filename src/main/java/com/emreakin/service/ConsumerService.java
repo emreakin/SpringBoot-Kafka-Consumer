@@ -4,17 +4,30 @@ import com.emreakin.model.CompanyModel;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class ConsumerService {
 
+    @RetryableTopic(include = {NullPointerException.class, ArrayIndexOutOfBoundsException.class},
+            attempts = "4",
+            backoff = @Backoff(delay = 1000, multiplier = 2),
+            topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE,
+            retryTopicSuffix = "testR",
+            dltTopicSuffix = "testDllt")
     @KafkaListener(topics = "${kafka.topics.user.name}",
             groupId = "${kafka.topics.user.group}",
             containerFactory = "userKafkaListenerFactory")
     public void consumeUser(ConsumerRecord<String, schema.avro.User> record) {
         schema.avro.User user = record.value();
+        user = null;
+        System.out.println("***********************************");
         System.out.println("User name : " + user.getName());
     }
 
